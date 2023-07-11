@@ -25,12 +25,4 @@ public interface UserMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     int registerUser(User user);
 
-//    @Update("UPDATE users SET token = #{token} WHERE id = #{id}")
-//    int updateUserToken(@Param("id") int id, @Param("token") String token);
-//
-//    @Update("UPDATE users SET token = NULL WHERE id = #{id}")
-//    int clearUserToken(@Param("id") int id);
-
-
-    // 其他的查询、插入、更新、删除方法可以根据需要添加
 }

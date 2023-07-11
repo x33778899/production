@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheConfig;
@@ -24,13 +26,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.Handler.ErrorResponse;
 import com.example.demo.config.LoginResultPublisher;
+import com.example.demo.model.LogSave;
 import com.example.demo.model.User;
+import com.example.demo.service.LogSaveService;
 import com.example.demo.service.UserService;
 import com.example.demo.utils.JwtTokenUtils;
 
 @RestController
 public class MyController {
     private final UserService userService;
+    
+    private final LogSaveService logSaveService;
 
     private final CacheManager cacheManager;
 
@@ -43,12 +49,13 @@ public class MyController {
     
     @Autowired
     public MyController(UserService userService, CacheManager cacheManager, JwtTokenUtils jwtTokenUtils, RedisTemplate<String, Object> redisTemplate
-    		,LoginResultPublisher loginResultPublisher) {
+    		,LoginResultPublisher loginResultPublisher,LogSaveService logSaveService) {
         this.userService = userService;
         this.cacheManager = cacheManager;
         this.jwtTokenUtils = jwtTokenUtils;
         this.redisTemplate = redisTemplate;
         this.loginResultPublisher = loginResultPublisher;
+        this.logSaveService=logSaveService;
     }
 
     @GetMapping("/hello")
@@ -62,13 +69,13 @@ public class MyController {
     }
 
     @PostMapping("/user/login")
-    public ResponseEntity<?> login(@RequestBody User loginRequest) {
+    public ResponseEntity<?> login(@RequestBody User loginRequest,HttpServletRequest request) {
         User user = userService.getUserByUsername(loginRequest.getAccount(), loginRequest.getPassword());
 
         if (user != null) {
             // 檢查使用者是否已經使用存儲在 Redis 中的令牌登入
-            if (redisTemplate.hasKey("token:" + user.getId())) {
-                String existingToken = (String) redisTemplate.opsForValue().get("token:" + user.getId());
+            if (redisTemplate.hasKey("token:" + user.getAccount())) {
+                String existingToken = (String) redisTemplate.opsForValue().get("token:" + user.getAccount());
 
                 // 如果沒有傳入令牌，刷新令牌並將其存儲在 Redis 中
                 if (loginRequest.getToken() == null || loginRequest.getToken().isEmpty()) {
@@ -76,13 +83,19 @@ public class MyController {
                     String token = jwtTokenUtils.createToken(user.getAccount(), "ROLE_USER", true);
 
                     // 覆蓋 Redis 中的值
-                    redisTemplate.opsForValue().set("token:" + user.getId(), token);
+                    redisTemplate.opsForValue().set("token:" + user.getAccount(), token);
 
                     // 使用新的令牌更新使用者物件
                     user.setToken(token);
 
                     // 構建成功登入的回應
                     ErrorResponse successResponse = new ErrorResponse(HttpStatus.OK.value(), "登入成功", token);
+                    
+                    LogSave logSave=new LogSave();
+                    logSave.setToken(token);
+                    logSave.setIp(request.getRemoteAddr());
+                    logSaveService.SaveLoginStatus(logSave);
+//                    
                     loginResultPublisher.publishLoginResult(user);
                     return ResponseEntity.ok(successResponse);
                 }
@@ -96,6 +109,7 @@ public class MyController {
 
                 // 令牌有效，構建成功登入的回應
                 ErrorResponse successResponse = new ErrorResponse(HttpStatus.OK.value(), "登入成功", existingToken);
+                
                 return ResponseEntity.ok(successResponse);
             } else {
                 // 如果沒有傳入令牌，刷新令牌並將其存儲在 Redis 中

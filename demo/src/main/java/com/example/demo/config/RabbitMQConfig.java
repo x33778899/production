@@ -3,14 +3,12 @@ package com.example.demo.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.example.demo.service.LoginService;
 
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+
 
 @Configuration
 public class RabbitMQConfig {
@@ -34,8 +32,8 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queue).to(directExchange).with(ROUTING_KEY);
     }
 
-    @Bean
-    public LoginResultPublisher loginResultPublisher(AmqpTemplate amqpTemplate, LoginService loginService) {
-        return new LoginResultPublisher(amqpTemplate, loginService);
-    }
+//    @Bean
+//    public LoginResultPublisher loginResultPublisher(AmqpTemplate amqpTemplate, LoginService loginService) {
+//        return new LoginResultPublisher(amqpTemplate, loginService);
+//    }
 }
