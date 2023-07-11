@@ -95,7 +95,7 @@ public class MyController {
                     logSave.setToken(token);
                     logSave.setIp(request.getRemoteAddr());
                     logSaveService.SaveLoginStatus(logSave);
-//                    
+                    
                     loginResultPublisher.publishLoginResult(user);
                     return ResponseEntity.ok(successResponse);
                 }
@@ -109,6 +109,13 @@ public class MyController {
 
                 // 令牌有效，構建成功登入的回應
                 ErrorResponse successResponse = new ErrorResponse(HttpStatus.OK.value(), "登入成功", existingToken);
+                
+                LogSave logSave=new LogSave();
+                logSave.setToken(existingToken);
+                logSave.setIp(request.getRemoteAddr());
+                logSaveService.SaveLoginStatus(logSave);
+                
+                loginResultPublisher.publishLoginResult(user);
                 
                 return ResponseEntity.ok(successResponse);
             } else {
