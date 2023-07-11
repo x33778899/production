@@ -1,0 +1,96 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+	
+	//controller
+	// https://mvnrepository.com/artifact/org.springframework/spring-web
+	implementation 'org.springframework:spring-web'
+
+	//啟動
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	//aop
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	
+	//註解
+	// https://mvnrepository.com/artifact/org.projectlombok/lombok
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+	
+	
+	//aop
+	// https://mvnrepository.com/artifact/org.aspectj/aspectjweaver
+	runtimeOnly 'org.aspectj:aspectjweaver'
+	
+	//驗證請求參數
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-parent
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-parent', version: '2.5.3', ext: 'pom'
+	
+
+	//springboot 2.3之前的集成在spring-boot-starter-web里了,所以不需要额外引入包
+
+	//springboot 2.3之后需要引入 spring-boot-starter-validation
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	
+	
+	//sql connector
+	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
+	implementation 'mysql:mysql-connector-java'
+	
+	
+	//security
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-core
+	implementation 'org.springframework.security:spring-security-core'
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-web
+	implementation 'org.springframework.security:spring-security-web'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools
+	implementation 'org.springframework.boot:spring-boot-devtools'
+	
+	//security
+	
+	//jwt
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	//jwt
+    
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    
+    //mq
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
